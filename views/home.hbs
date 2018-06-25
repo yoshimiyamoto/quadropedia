@@ -1,0 +1,97 @@
+<h2>MultiLang Wikipedia</h2>
+<br />
+<div>
+  {{#each langs}}
+  <div>
+    <iframe
+      frameborder="0"
+      id="{{this}}"
+      src="/lang/{{this}}"></iframe>
+  </div>
+  {{/each}}
+</div>
+
+<script>
+var frameLangs = [];
+var translations = {};
+document.addEventListener("DOMContentLoaded", function(){
+	context = window.top;
+	for (i = 0; i < context.frames.length; i++){
+		frameLangs.push(context.frames[i].frameElement.id);
+		//context.frames[i].frameElement.addEventListener("load", function(){
+		//});
+	}
+});
+document.addEventListener("DOMFrameContentLoaded", function(e){
+  var frame = e.target;
+  //alert(frame.id);
+  //alert("Frame: " + frame.id + " loaded");
+  //alert(frame.contentDocument.domain + " - " + frame.contentDocument.documentURI);
+  //alert(frame.contentWindow.location.protocol + " - " + frame.contentWindow.location.host + " - " + frame.contentWindow.location.pathname);
+
+  //var translations = document.createElement('div');
+  //translations.id = 'translations';
+
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function(){
+    if (this.readyState == 4 && this.status == 200) {
+      translations[frame.id] = this.responseText; //JSON.parse(this.responseTest);
+      alert(translations[frame.id]);
+      //translations.dataset.available = this.responseText;
+      //frame.contentDocument.body.appendChild(translations);
+    }
+  };
+  var transRef = "transget" + frame.contentWindow.location.pathname;
+  xhttp.open("GET", transRef, true);
+  xhttp.send();
+
+  //var transDiv = frame.contentDocument.getElementById('translations')
+  //if (transDiv) {
+  //  translations = JSON.parse(transDiv.dataset.available);
+  //  //parent.updateFrames(frame.id);
+  //  updateFrames(frame.id);
+  //}
+});
+function updateFrames(id){
+	//alert("Updating based on: " + id);
+  //for (var key in translations){
+  //  alert(key);
+  //}
+  for (i = 0; i < frameLangs.length; i++){
+    // For all other frame id's
+    chkLang = frameLangs[i];
+    if (chkLang != id){
+      // Check if translation available
+      alert("Updating " + chkLang);
+      if (translations[chkLang]){
+        // Update as necessary
+        var url = "lang/trans/" + chkLang + "/wiki/" + translations[chkLang];
+        alert("Found translation - updating: " + url);
+        document.getElementById(chkLang).src = url
+        //"https://" + chkLang + "m.wikipedia.org/wiki/" + translations[chkLang];
+      } else {
+        // Display placeholder
+        alert("No translation");
+        document.getElementById(chkLang).contentDocument.document.write("<html><body>No translation available.</body></html>");
+      }
+    }
+  }
+  // Tidy up
+  // i.e. empty translations array ??
+}
+
+//<!--
+//<script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+//$(document).ready(function() {
+//    $('iframe').on('load', function() {
+//        //transDiv = $(this).contentWindow.document.getElementById('translations');
+//        alert($(this).prev().prop('nodeName'));
+//        //alert("TEST:" + transDiv.dataset.available);
+//        //alert(transDiv.getAttribute('data-available'));
+//        //alert($('iframe').contents().find('div#translations').data('available')[0]);
+//            //alert($(this).attr('href') + ' clicked');
+//        //});
+//    });
+//});
+//-->
+</script>
