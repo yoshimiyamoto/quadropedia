@@ -1,0 +1,12 @@
+Works in Firefox. Untested in other browsers.
+
+Linux:
+  - Use a terminal to navigate to project directory
+  - Run `node server.js`
+  - Navigate to "127.0.0.1:3000/" or "localhost:3000/" in your browser
+  - To quit, press Ctrl+C in terminal
+
+Windows:
+  - Execute run.bat file
+  - Navigate to "127.0.0.1:3000/" or "localhost:3000/" in your browser
+  - To quit, close CMD.exe opened by run.bat
