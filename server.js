@@ -25,11 +25,11 @@ app.set('views', path.join(__dirname, 'views'));
 var langs = ["en", "de", "fr", "es"];
 app.get('/', (req, res) => {
   res.render('home', {langs: langs});
-})
+});
 
 app.get('/page/unavailable', (req, res) => {
   res.render('unavailable');
-})
+});
 
 app.get('/wiki/*', function(req, res){
   // Extract language from referer
@@ -38,7 +38,7 @@ app.get('/wiki/*', function(req, res){
   // Redirect so that the requested url now contains language identifier
   // Note: Ideally find a way to avoid this extra server request
   res.redirect(uri);
-})
+});
 
 app.get('/w/*', grabStatic);
 app.get('/static/*', grabStatic);
@@ -50,11 +50,27 @@ app.use( (err, req, res, next) => {
   // Log any error, for now this is rather basic
   console.log('Error:', err);
   res.status(err.status).send(`${err.status}: Something broke!`);
-})
+});
 
 var server = app.listen(port, function() {
   console.log('Express is listening to http://localhost:' + port);
-})
+
+  if (process.platform === "win32") {
+    var rl = require("readline").createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+    rl.on("SIGINT", function () {
+      process.emit("SIGINT");
+    });
+  }
+  process.on('SIGINT', function() {
+    process.exit(0);
+  });
+  process.on('SIGTERM', function() {
+    process.exit(0);
+  });
+});
 
 function grabStatic(req, res){
   // Grab static content directly from wikipedia
@@ -62,5 +78,5 @@ function grabStatic(req, res){
   request({uri: uri}, function(err, response, body){
     res.set(response.headers);
     res.send(body);
-  })
+  });
 }
