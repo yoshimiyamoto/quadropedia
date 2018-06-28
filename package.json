@@ -1,12 +1,12 @@
 {
-  "name": "mlw",
+  "name": "Quadropedia",
   "version": "0.0.1",
-  "description": "Multi-language Wikipedia",
+  "description": "Wikipedia browser of four parallel languages",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Yoshi Miyamoto",
   "license": "UNLICENSED",
   "dependencies": {
     "express": "^4.16.3",
