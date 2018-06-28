@@ -1,69 +1,67 @@
-<h2>MultiLang Wikipedia</h2>
-<br />
-<div>
-  {{#each langs}}
-  <div>
-    <iframe
-      frameborder="0"
-      id="{{this}}"
-      src="/page/{{this}}"></iframe>
-  </div>
-  {{/each}}
-</div>
+    <div>
+      {{#each langs}}
+      <div>
+        <iframe
+          frameborder="0"
+          id="{{this}}"
+          src="/page/{{this}}"></iframe>
+      </div>
+      {{/each}}
+    </div>
 
-<script>
-// GLOBALS //
-var frameLangs = [];
-var translations = {};
-var transcode = "translation";
+    <script>
+    // GLOBALS //
+    var frameLangs = [];
+    var translations = {};
+    var transcode = "translation";
 
-// LISTENERS //
-document.addEventListener("DOMContentLoaded", function(){
-	context = window.top;
-	for (i = 0; i < context.frames.length; i++){
-		frameLangs.push(context.frames[i].frameElement.id);
-	}
-});
+    // LISTENERS //
+    document.addEventListener("DOMContentLoaded", function(){
+    	context = window.top;
+    	for (i = 0; i < context.frames.length; i++){
+    		frameLangs.push(context.frames[i].frameElement.id);
+    	}
+    });
 
-document.addEventListener("DOMFrameContentLoaded", function(e){
-  var frame = e.target;
-  var path = frame.contentWindow.location.pathname;
+    document.addEventListener("DOMFrameContentLoaded", function(e){
+      var frame = e.target;
+      var path = frame.contentWindow.location.pathname;
 
-  // Only grab translations if page is itself not a grabbed translation
-  res = path.match( /^\/page\/[a-zA-Z]{2,3}\/wiki\/.*?(?:\/(.*))?$/ );
-  if ( res && res[1] != transcode ) {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function(){
-      if (this.readyState == 4 && this.status == 200) {
-        translations = JSON.parse(this.responseText);
-        updateFrames(frame.id);
+      // Only grab translations if page is itself not a grabbed translation
+      res = path.match( /^\/page\/[a-zA-Z]{2,3}\/wiki\/.*?(?:\/(.*))?$/ );
+      if ( res && res[1] != transcode ) {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function(){
+          if (this.readyState == 4 && this.status == 200) {
+            translations = JSON.parse(this.responseText);
+            updateFrames(frame.id);
+          }
+        };
+        var transURL = "transget" + path;
+        xhttp.open("GET", transURL, true);
+        xhttp.send();
       }
-    };
-    var transURL = "transget" + path;
-    xhttp.open("GET", transURL, true);
-    xhttp.send();
-  }
-});
+    });
 
-// FUNCTIONS //
-function updateFrames(id){
-  for (i = 0; i < frameLangs.length; i++){
-    chkLang = frameLangs[i];
-    // For all other frame id's
-    if (chkLang != id){
-      // Check if translation available
-      if (translations[chkLang]){
-        // Load translation in appropriate frame
-        var url = "page/" + chkLang + "/wiki/" + translations[chkLang] + "/" + transcode;
-        document.getElementById(chkLang).src = url
-      } else {
-        // Display placeholder
-        var url = "page/unavailable";
-        document.getElementById(chkLang).src = url;
+    // FUNCTIONS //
+    function updateFrames(id){
+      for (i = 0; i < frameLangs.length; i++){
+        chkLang = frameLangs[i];
+        // For all other frame id's
+        if (chkLang != id){
+          // Check if translation available
+          if (translations[chkLang]){
+            // Load translation in appropriate frame
+            var url = "page/" + chkLang + "/wiki/" + translations[chkLang] + "/" + transcode;
+            document.getElementById(chkLang).src = url
+          } else {
+            // Display placeholder
+            var url = "page/unavailable";
+            document.getElementById(chkLang).src = url;
+          }
+        }
       }
+      // Tidy up
+      // i.e. empty translations array ??
     }
-  }
-  // Tidy up
-  // i.e. empty translations array ??
-}
-</script>
+    </script>
