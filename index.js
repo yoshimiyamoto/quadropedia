@@ -2,15 +2,11 @@ const path = require('path');
 const express = require('express');
 const exphbs = require('express-handlebars');
 const request = require('request');
-
-var app = express();
-//var router = express.Router();
-var port = 3000;
-
 var page = require('./page.js');
 var transget = require('./transget.js');
 
-var langs = ["en", "de", "fr", "es"];
+var app = express();
+var port = 3000;
 
 app.engine('hbs', exphbs({
   defaultLayout: 'main',
@@ -20,12 +16,13 @@ app.engine('hbs', exphbs({
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
 
-app.use( (req, res, next) => {
-  //console.log(req.url);
-  //console.log(req.headers)
-  next();
-})
+//app.use( (req, res, next) => {
+//  console.log(req.url);
+//  console.log(req.headers)
+//  next();
+//})
 
+var langs = ["en", "de", "fr", "es"];
 app.get('/', (req, res) => {
   res.render('home', {langs: langs});
 })
@@ -36,12 +33,10 @@ app.get('/page/unavailable', (req, res) => {
 
 app.get('/wiki/*', function(req, res){
   // Extract language from referer
-  //var referer = req.headers.referer.match( /^(?:https?):\/\/.+(\/page\/.*?)(?:\/.*)*$/ );
   var referer = req.headers.referer.match( /^(?:https?):\/\/.+(\/page\/[a-zA-Z]{2,3})(?:\/.*)?$/ );
   var uri = referer[1] + req.url;
-
-  //console.log(req.headers.referer);
-
+  // Redirect so that the requested url now contains language identifier
+  // Note: Ideally find a way to avoid this extra server request
   res.redirect(uri);
 })
 
@@ -52,7 +47,7 @@ app.use('/page', page);
 app.use('/transget', transget);
 
 app.use( (err, req, res, next) => {
-  // Log any error, for now just console.log
+  // Log any error, for now this is rather basic
   console.log('Error:', err);
   res.status(err.status).send(`${err.status}: Something broke!`);
 })
@@ -62,16 +57,10 @@ var server = app.listen(port, function() {
 })
 
 function grabStatic(req, res){
-  // Grab static content from wikipedia
+  // Grab static content directly from wikipedia
   var uri = "https://www.wikipedia.org" + req.url;
   request({uri: uri}, function(err, response, body){
-    res.set({
-      'date' : response.headers['date'],
-      'connection' : response.headers['connection'],
-      'content-type' : response.headers['content-type'],
-      'content-length' : Buffer.byteLength(body), //response.headers['content-length'],
-      'etag' : response.headers['etag']
-    })
+    res.set(response.headers);
     res.send(body);
   })
 }

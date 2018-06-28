@@ -4,29 +4,6 @@ var request = require('request');
 var express = require('express');
 var router = express.Router();
 
-function isTranslation (elem) {
-  if (typeof elem.attribs.class !== "undefined") {
-    var re = new RegExp(/^.*interwiki-([a-zA-Z]{2,3})$/);
-    var arrMatches = elem.attribs.class.match(re);
-    if (arrMatches) {
-      return true;
-    }
-  }
-}
-
-var htmlparser = require('htmlparser2');
-var transhandler = new htmlparser.DomHandler(function (err, dom){
-  if (err) {
-    console.log(err);
-  }
-  else {
-    //console.log(dom);
-  }
-}, {
-  normalizeWhitespace: true
-})
-var transparser = new htmlparser.Parser(transhandler, {decodeEntities: true});
-
 router.get(/^\/page\/([a-zA-Z]{2,3})(\/wiki\/.*)$/, function(req, res){
   var id = req.params[0];
   var ref = req.params[1];
@@ -46,13 +23,36 @@ router.get(/^\/page\/([a-zA-Z]{2,3})(\/wiki\/.*)$/, function(req, res){
         var re = new RegExp(/^(?:https?):\/\/([a-zA-Z]{2,3})\..+\/wiki\/(.*)$/);
         var match = item.children[0].attribs.href.match(re);
         if (match) {
+          // Store any translations found
           transLinks[match[1]] = match[2];
         }
       }
     }
-    //console.log(transLinks);
     res.send(JSON.stringify(transLinks));
   })
 })
+
+var htmlparser = require('htmlparser2');
+var transhandler = new htmlparser.DomHandler(function (err, dom){
+  if (err) {
+    console.log(err);
+  }
+  else {
+    //console.log(dom);
+  }
+}, {
+  normalizeWhitespace: true
+})
+var transparser = new htmlparser.Parser(transhandler, {decodeEntities: true});
+
+function isTranslation (elem) {
+  if (typeof elem.attribs.class !== "undefined") {
+    var re = new RegExp(/^.*interwiki-([a-zA-Z]{2,3})$/);
+    var arrMatches = elem.attribs.class.match(re);
+    if (arrMatches) {
+      return true;
+    }
+  }
+}
 
 module.exports = router;
