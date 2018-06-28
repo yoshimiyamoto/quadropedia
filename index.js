@@ -7,7 +7,9 @@ var app = express();
 //var router = express.Router();
 var port = 3000;
 
-var lang = require('./lang.js');
+var page = require('./page.js');
+var transget = require('./transget.js');
+
 var langs = ["en", "de", "fr", "es"];
 
 app.engine('hbs', exphbs({
@@ -24,33 +26,30 @@ app.use( (req, res, next) => {
   next();
 })
 
-app.use( (req, res, next) => {
-  //req.chance = Math.random()
-  next();
-})
-
 app.get('/', (req, res) => {
   res.render('home', {langs: langs});
 })
 
-//app.use('/wiki/*', router);
+app.get('/page/unavailable', (req, res) => {
+  res.render('unavailable');
+})
 
 app.get('/wiki/*', function(req, res){
   // Extract language from referer
-  //var referer = req.headers.referer.match( /^(?:https?):\/\/.+(\/lang\/.*?)(?:\/.*)*$/ );
-  var referer = req.headers.referer.match( /^(?:https?):\/\/.+(\/lang\/[a-zA-Z]{2,3})(?:\/.*)*$/ );
+  //var referer = req.headers.referer.match( /^(?:https?):\/\/.+(\/page\/.*?)(?:\/.*)*$/ );
+  var referer = req.headers.referer.match( /^(?:https?):\/\/.+(\/page\/[a-zA-Z]{2,3})(?:\/.*)?$/ );
   var uri = referer[1] + req.url;
+
+  //console.log(req.headers.referer);
+
   res.redirect(uri);
-  // Note: Perhaps a cookie could be viable alternative to a redirect
-  // might save some time along with the extra request
 })
 
 app.get('/w/*', grabStatic);
 app.get('/static/*', grabStatic);
 
-app.use('/lang', lang);
-
-app.use('/transget', lang);
+app.use('/page', page);
+app.use('/transget', transget);
 
 app.use( (err, req, res, next) => {
   // Log any error, for now just console.log
