@@ -27,21 +27,18 @@ document.addEventListener("DOMContentLoaded", function(){
 
 document.addEventListener("DOMFrameContentLoaded", function(e){
   var frame = e.target;
-  //alert("Frame: " + frame.id + " loaded");
-  //alert(frame.contentWindow.location.protocol + " - " + frame.contentWindow.location.host + " - " + frame.contentWindow.location.pathname);
-
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function(){
-    if (this.readyState == 4 && this.status == 200) {
-      translations = JSON.parse(this.responseText);
-      updateFrames(frame.id);
-    }
-  };
-
   var path = frame.contentWindow.location.pathname;
-  // Only grab translations if page is itselg not a grabbed translation
+
+  // Only grab translations if page is itself not a grabbed translation
   res = path.match( /^\/page\/[a-zA-Z]{2,3}\/wiki\/.*?(?:\/(.*))?$/ );
   if ( res && res[1] != transcode ) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function(){
+      if (this.readyState == 4 && this.status == 200) {
+        translations = JSON.parse(this.responseText);
+        updateFrames(frame.id);
+      }
+    };
     var transURL = "transget" + path;
     xhttp.open("GET", transURL, true);
     xhttp.send();
@@ -51,19 +48,18 @@ document.addEventListener("DOMFrameContentLoaded", function(e){
 // FUNCTIONS //
 function updateFrames(id){
   for (i = 0; i < frameLangs.length; i++){
-    // For all other frame id's
     chkLang = frameLangs[i];
+    // For all other frame id's
     if (chkLang != id){
       // Check if translation available
       if (translations[chkLang]){
-        // Update as necessary
+        // Load translation in appropriate frame
         var url = "page/" + chkLang + "/wiki/" + translations[chkLang] + "/" + transcode;
         document.getElementById(chkLang).src = url
       } else {
         // Display placeholder
         var url = "page/unavailable";
         document.getElementById(chkLang).src = url;
-        //document.getElementById(chkLang).contentWindow.document.write("<html><body>No translation available.</body></html>");
       }
     }
   }
