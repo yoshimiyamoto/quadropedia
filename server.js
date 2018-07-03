@@ -16,13 +16,16 @@ app.engine('hbs', exphbs({
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
 
-//app.use( (req, res, next) => {
-//  console.log(req.url);
-//  console.log(req.headers)
-//  next();
-//})
+var referer;
+app.use( (req, res, next) => {
+  if (req.headers.referer) {
+    // Extract language from referer
+    referer = req.headers.referer.match( /^https?\:\/\/.+(\/page\/([a-zA-Z]{2,}(?:\-[a-zA-Z]{2,}){0,2}))(?:\/wiki)?(\/.*?)?(?:\/.*)?$/ );
+  }
+  next();
+})
 
-var langs = ["en", "de", "fr", "es"];
+var langs = ["fr", "ru", "ar", "en"];
 app.get('/', (req, res) => {
   res.render('home', {langs: langs});
 });
@@ -32,11 +35,9 @@ app.get('/page/unavailable', (req, res) => {
 });
 
 app.get('/wiki/*', function(req, res){
-  // Extract language from referer
-  var referer = req.headers.referer.match( /^(?:https?):\/\/.+(\/page\/[a-zA-Z]{2,3})(?:\/.*)?$/ );
-  var uri = referer[1] + req.url;
   // Redirect so that the requested url now contains language identifier
   // Note: Ideally find a way to avoid this extra server request
+  var uri = referer[1] + req.url;
   res.redirect(uri);
 });
 
@@ -55,6 +56,7 @@ app.use( (err, req, res, next) => {
 var server = app.listen(port, function() {
   console.log('Express is listening to http://localhost:' + port);
 
+  // Handle exit neatly on Linux and Windows
   if (process.platform === "win32") {
     var rl = require("readline").createInterface({
       input: process.stdin,
@@ -73,10 +75,35 @@ var server = app.listen(port, function() {
 });
 
 function grabStatic(req, res){
+  var uri_lang;
+  if (req.query.lang == null) {
+    if (referer) {
+      uri_lang = referer[2];
+    } else {
+      console.log("Error Language Missing:", referer);
+    }
+  } else {
+    uri_lang = req.query.lang;
+  }
+
+  var uri_protocol = "https://"
+  var uri_base = uri_lang + ".m.wikipedia.org";
+  var uri = uri_protocol + uri_base + req.url;
+
   // Grab static content directly from wikipedia
-  var uri = "https://www.wikipedia.org" + req.url;
-  request({uri: uri}, function(err, response, body){
-    res.set(response.headers);
-    res.send(body);
+  var options = {
+    url : uri,
+    headers : {
+      'host' : uri_base,
+      'referer' : uri_base + referer[3]
+    }
+  }
+  request(options, function(err, response, body){
+    if (err) {
+      console.log("Error:", err);
+    } else {
+      res.set(response.headers);
+      res.send(body);
+    }
   });
 }

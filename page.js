@@ -4,15 +4,15 @@ var request = require('request');
 var express = require('express');
 var router = express.Router();
 
-router.get(/^\/([a-zA-Z]{2,3})(\/wiki\/.*?)(?:\/.*)?$/, function(req, res){
+router.get(/^\/([a-zA-Z]{2,}(?:\-[a-zA-Z]{2,}){0,2})(\/wiki\/.*?)(?:\/.*)?$/, function(req, res){
   // Note: The above regex will catch both standard wiki links,
-  // but also links that have extra part(s) to the url.
+  // but also links that have an extra part to the url.
   // Any extras are ignored here, and processed client side
 
   // Grab page from wikipedia
   var lang = req.params[0];
   var ref = req.params[1];
-  var uri = "https://" + lang + ".m.wikipedia.org" + ref;
+  var uri = encodeURI("https://" + lang + ".m.wikipedia.org" + ref);
 
   request({uri: uri}, function(err, response, body){
     res.send(body);
@@ -22,7 +22,7 @@ router.get(/^\/([a-zA-Z]{2,3})(\/wiki\/.*?)(?:\/.*)?$/, function(req, res){
 router.get('/:lang', function(req, res){
   // Grab daily article from wikipedia
   var lang = req.params.lang;
-  var uri = "https://" + lang + ".m.wikipedia.org";
+  var uri = encodeURI("https://" + lang + ".m.wikipedia.org");
   request({uri: uri}, function(err, response, body){
     res.send(body);
   })

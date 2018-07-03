@@ -1,6 +1,7 @@
     <div>
       {{#each langs}}
       <div>
+        <div class="frameTitle"></div>
         <iframe
           frameborder="0"
           id="{{this}}"
@@ -11,6 +12,7 @@
 
     <script>
     // GLOBALS //
+    var DEBUG = 1;
     var frameLangs = [];
     var translations = {};
     var transcode = "translation";
@@ -27,8 +29,12 @@
       var frame = e.target;
       var path = frame.contentWindow.location.pathname;
 
+      if (DEBUG) {
+        frame.parentElement.getElementsByClassName("frameTitle")[0].innerText = frame.contentWindow.location.href;
+      }
+
       // Only grab translations if page is itself not a grabbed translation
-      res = path.match( /^\/page\/[a-zA-Z]{2,3}\/wiki\/.*?(?:\/(.*))?$/ );
+      res = path.match( /^\/page\/[a-zA-Z]{2,}(?:\-[a-zA-Z]{2,}){0,2}\/wiki\/.*?(?:\/(.*))?$/ );
       if ( res && res[1] != transcode ) {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function(){

@@ -4,12 +4,12 @@ var request = require('request');
 var express = require('express');
 var router = express.Router();
 
-router.get(/^\/page\/([a-zA-Z]{2,3})(\/wiki\/.*)$/, function(req, res){
+router.get(/^\/page\/([a-zA-Z]{2,}(?:\-[a-zA-Z]{2,}){0,2})(\/wiki\/.*)$/, function(req, res){
   var id = req.params[0];
   var ref = req.params[1];
   var transLinks = {};
   var options = {
-    url : "https://" + id + ".wikipedia.org" + ref,
+    url : encodeURI("https://" + id + ".wikipedia.org" + ref),
     headers : {
       'Accept' : 'text/html'
     }
@@ -20,7 +20,7 @@ router.get(/^\/page\/([a-zA-Z]{2,3})(\/wiki\/.*)$/, function(req, res){
     var translations = htmlparser.DomUtils.findAll(isTranslation, transparser._cbs.dom)
     for (item of translations) {
       if (item.children[0].name == "a") {
-        var re = new RegExp(/^(?:https?):\/\/([a-zA-Z]{2,3})\..+\/wiki\/(.*)$/);
+        var re = new RegExp(/^(?:https?):\/\/([a-zA-Z]{2,}(?:\-[a-zA-Z]{2,}){0,2})\..+\/wiki\/(.*)$/);
         var match = item.children[0].attribs.href.match(re);
         if (match) {
           // Store any translations found
@@ -47,7 +47,7 @@ var transparser = new htmlparser.Parser(transhandler, {decodeEntities: true});
 
 function isTranslation (elem) {
   if (typeof elem.attribs.class !== "undefined") {
-    var re = new RegExp(/^.*interwiki-([a-zA-Z]{2,3}(?:\-[a-zA-Z]{2,3})?).*$/);
+    var re = new RegExp(/^.*interwiki-([a-zA-Z]{2,}(?:\-[a-zA-Z]{2,}){0,2}).*$/);
     var arrMatches = elem.attribs.class.match(re);
     if (arrMatches) {
       return true;
