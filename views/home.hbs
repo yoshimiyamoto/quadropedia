@@ -1,28 +1,36 @@
-    <div>
-      {{#each langs}}
+    <div id="container">
+      {{#iter numFrames}}
       <div>
-        <div class="frameTitle"></div>
-        <iframe
-          frameborder="0"
-          id="{{this}}"
-          src="/page/{{this}}"></iframe>
+        <select id="langSelect_{{this}}" onchange="changeFrameLang(this)" style="width:100%;">
+          <option value="" disabled selected>Select language</option>
+        </select>
+        <div class="frameURL"></div>
+        <iframe id="" src="" frameborder="0"></iframe>
       </div>
-      {{/each}}
+      {{/iter}}
     </div>
 
     <script>
     // GLOBALS //
-    var DEBUG = 1;
-    var frameLangs = [];
-    var translations = {};
+    var DEBUG = 0;
     var transcode = "translation";
+    var translations = {};
+    // Set some initial frame languages
+    // Could be replaced by a cookie instead
+    var frameLangs = ['en', 'de', 'ru', 'ar'];
 
     // LISTENERS //
     document.addEventListener("DOMContentLoaded", function(){
-    	context = window.top;
-    	for (i = 0; i < context.frames.length; i++){
-    		frameLangs.push(context.frames[i].frameElement.id);
-    	}
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function(){
+        if (this.readyState == 4 && this.status == 200) {
+          populateLanguageSelects(JSON.parse(this.responseText));
+          if (frameLangs) initLanguageSelects();
+        }
+      }
+      xhr.open("GET", "languages", true);
+      xhr.send();
+
     });
 
     document.addEventListener("DOMFrameContentLoaded", function(e){
@@ -30,7 +38,7 @@
       var path = frame.contentWindow.location.pathname;
 
       if (DEBUG) {
-        frame.parentElement.getElementsByClassName("frameTitle")[0].innerText = frame.contentWindow.location.href;
+        frame.parentElement.getElementsByClassName("frameURL")[0].innerText = frame.contentWindow.location.href;
       }
 
       // Only grab translations if page is itself not a grabbed translation
@@ -40,7 +48,7 @@
         xhttp.onreadystatechange = function(){
           if (this.readyState == 4 && this.status == 200) {
             translations = JSON.parse(this.responseText);
-            updateFrames(frame.id);
+            loadTranslations(frame.id);
           }
         };
         var transURL = "transget" + path;
@@ -50,7 +58,35 @@
     });
 
     // FUNCTIONS //
-    function updateFrames(id){
+    function populateLanguageSelects(langs){
+      var html = '';
+      for (var k in langs) {
+        html += '<option value="' + k + '">';
+        html += langs[k].original + ' (' + langs[k].romanized + ')';
+        html += '</option>\n';
+      }
+      var frameCount = window.top.frames.length;
+      for (var i = 0; i < frameCount; i++) {
+        document.getElementById("langSelect_" + i).innerHTML += '\n' + html;
+      }
+      //for (i = 0; i < frameCount; i++){
+      //  document.getElementById(frameLangs[i] + "_langSelect").innerHTML += '\n' + html;
+      //}
+    };
+
+    function initLanguageSelects(){
+      for (var i = 0; i < frameLangs.length; i++) {
+        var dropdown = document.getElementById("langSelect_" + i);
+        for (j = 0; j < dropdown.options.length; j++) {
+          if (dropdown.options[j].value == frameLangs[i]) {
+            dropdown.options[j].selected = true;
+            dropdown.onchange();
+          }
+        }
+      }
+    };
+
+    function loadTranslations(id){
       for (i = 0; i < frameLangs.length; i++){
         chkLang = frameLangs[i];
         // For all other frame id's
@@ -59,15 +95,34 @@
           if (translations[chkLang]){
             // Load translation in appropriate frame
             var url = "page/" + chkLang + "/wiki/" + translations[chkLang] + "/" + transcode;
-            document.getElementById(chkLang).src = url
+            newFrameSrc(chkLang, url);
           } else {
             // Display placeholder
             var url = "page/unavailable";
-            document.getElementById(chkLang).src = url;
+            newFrameSrc(chkLang, url);
           }
         }
       }
       // Tidy up
       // i.e. empty translations array ??
-    }
+    };
+
+    function changeFrameLang(obj){
+      var sectionId = obj.id.split('_')[1];
+      var newLang = obj.value;
+      // Alter relevant frame and select object id's
+      obj.parentNode.getElementsByTagName("iframe")[0].id = newLang;
+      // Update frame reference
+      frameLangs[sectionId] = newLang;
+      // Prep new frame src
+      var url = "page/" + newLang;
+      if (translations[newLang]) {
+        url += "/wiki/" + translations[newLang] + '/' + transcode;
+      }
+      newFrameSrc(newLang, url);
+    };
+
+    function newFrameSrc(lang, url){
+      document.getElementById(lang).src = url;
+    };
     </script>

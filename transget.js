@@ -46,7 +46,7 @@ var transhandler = new htmlparser.DomHandler(function (err, dom){
 var transparser = new htmlparser.Parser(transhandler, {decodeEntities: true});
 
 function isTranslation (elem) {
-  if (typeof elem.attribs.class !== "undefined") {
+  if (elem.attribs.class) {
     var re = new RegExp(/^.*interwiki-([a-zA-Z]{2,}(?:\-[a-zA-Z]{2,}){0,2}).*$/);
     var arrMatches = elem.attribs.class.match(re);
     if (arrMatches) {
