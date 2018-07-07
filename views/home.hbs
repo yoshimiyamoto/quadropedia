@@ -31,6 +31,13 @@
       xhr.open("GET", "languages", true);
       xhr.send();
 
+      context = window.top;
+      for (i = 0; i < context.frames.length; i++){
+        context.frames[i].frameElement.addEventListener("load", function(e){
+          // Scroll to (hopefully) opening descriptive paragraph
+          scrollToDescription(e.target.contentDocument);
+        });
+      }
     });
 
     document.addEventListener("DOMFrameContentLoaded", function(e){
@@ -124,5 +131,21 @@
 
     function newFrameSrc(lang, url){
       document.getElementById(lang).src = url;
+    };
+
+    function scrollToDescription(doc){
+      if (doc.getElementById("mf-section-0")) {
+        var desc;
+        for (p of doc.getElementById("mf-section-0").getElementsByTagName("p")) {
+          if ( p.parentElement.id == "mf-section-0" && !(p.classList.contains("mw-empty-elt")) && p.innerText != "" ) {
+            desc = p;
+            break;
+          }
+        }
+        if (desc) {
+          desc.scrollIntoView();
+          //doc.documentElement.scrollTop = desc.offsetTop;
+        }
+      }
     };
     </script>
