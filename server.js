@@ -18,6 +18,8 @@ app.engine('hbs', exphbs({
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
 
+app.use('/static', express.static(__dirname + '/static'));
+
 app.use( (req, res, next) => {
   if (req.headers.referer) {
     // Extract language from referer
