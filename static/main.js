@@ -148,8 +148,9 @@ function scrollToDescription(doc){
   if (doc.getElementById("mf-section-0")) {
     var desc;
     for (p of doc.getElementById("mf-section-0").getElementsByTagName("p")) {
-      if ( p.parentElement.id == "mf-section-0" && !(p.classList.contains("mw-empty-elt")) && p.innerText != "" ) {
+      if ( p.parentElement.id == "mf-section-0" && !(p.classList.contains("mw-empty-elt")) && p.textContent != "" ) {
         desc = p;
+        console.log(desc);
         break;
       }
     }
