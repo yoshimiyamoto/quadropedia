@@ -4,7 +4,7 @@ var transcode = "translation";
 var translations = {};
 // Set some initial frame languages
 // Could be replaced by a cookie
-var frameLangs = ['en', 'de', 'ru', 'ar'];
+var frameLangs = ['en', 'fr', 'ru', 'ar'];
 
 // LISTENERS //
 document.addEventListener("DOMContentLoaded", function(){
@@ -150,7 +150,6 @@ function scrollToDescription(doc){
     for (p of doc.getElementById("mf-section-0").getElementsByTagName("p")) {
       if ( p.parentElement.id == "mf-section-0" && !(p.classList.contains("mw-empty-elt")) && p.textContent != "" ) {
         desc = p;
-        console.log(desc);
         break;
       }
     }

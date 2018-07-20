@@ -4,10 +4,14 @@ var request = require('request');
 var express = require('express');
 var router = express.Router();
 
-router.get(/^\/page\/([a-zA-Z]{2,}(?:\-[a-zA-Z]{2,}){0,2})(\/wiki\/.*)$/, function(req, res){
+router.get(/^\/page\/([a-zA-Z]{2,}(?:\-[a-zA-Z]{2,}){0,2})(\/wiki\/(.*?)?)(?:\/.*)?$/, function(req, res){
   var id = req.params[0];
   var ref = req.params[1];
   var transLinks = {};
+
+  // Store the language initiating the request an available translation
+  transLinks[id] = req.params[2];
+
   var options = {
     url : encodeURI("https://" + id + ".wikipedia.org" + ref),
     headers : {
@@ -35,7 +39,7 @@ router.get(/^\/page\/([a-zA-Z]{2,}(?:\-[a-zA-Z]{2,}){0,2})(\/wiki\/.*)$/, functi
 var htmlparser = require('htmlparser2');
 var transhandler = new htmlparser.DomHandler(function (err, dom){
   if (err) {
-    console.log(err);
+    console.log('ERROR (transhandler):', err);
   }
   else {
     //console.log(dom);

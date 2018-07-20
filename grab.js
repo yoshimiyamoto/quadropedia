@@ -2,6 +2,7 @@
 
 var fs = require('fs');
 var request = require('request');
+var log = require('./log.js');
 
 var grab = module.exports = {};
 
@@ -9,11 +10,13 @@ grab.static = function(req, res){
   var referer = res.locals.referer;
   var uri_lang;
 
+  if (!referer) console.log('ERROR - NO LOCAL REFERER FOR STATIC REQ:', req.headers);
+
   if (req.query.lang == null) {
     if (referer) {
       uri_lang = referer[2];
     } else {
-      console.log("Error - Language Missing: ", referer);
+      console.log("Error - Language Missing:", referer);
     }
   } else {
     uri_lang = req.query.lang;
@@ -22,13 +25,17 @@ grab.static = function(req, res){
   var uri_protocol = "https://"
   var uri_base = uri_lang + ".m.wikipedia.org";
   var uri = uri_protocol + uri_base + req.url;
+  var pg = "";
+  if (referer && referer[3]) pg = referer[3];
 
   // Grab static content directly from wikipedia
+  //console.warn(log.colours.FgYellow + 'GRABBING STATIC:' + log.colours.Reset, uri);
   var options = {
     url : uri,
+    encoding : null,
     headers : {
       'host' : uri_base,
-      'referer' : uri_base + referer[3]
+      'referer' : uri_base + pg
     }
   }
   request(options, function(err, response, body){
@@ -36,6 +43,8 @@ grab.static = function(req, res){
       console.log("Error:", err);
     } else {
       res.set(response.headers);
+      //if (response.headers['content-type'].includes('image/png')) {
+      //}
       res.send(body);
     }
   });
@@ -56,8 +65,8 @@ grab.allLanguages = function(req, res){
 
   if (file) {
     file_date = new Date(Date.UTC(file[1], file[2]-1, file[3]));
-    if ( curr_date.getTime() - file_date.getTime() > (7 * (24 * 60 * 60 * 1000)) ) {
-      console.log("Language list older the 1 week - updating...");
+    if ( curr_date.getTime() - file_date.getTime() > (28 * (24 * 60 * 60 * 1000)) ) {
+      console.log("Language list older the 4 weeks - updating...");
       UPDATE = true;
     } else {
       res.send(fs.readFileSync(dir + file[0]));

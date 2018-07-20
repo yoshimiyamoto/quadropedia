@@ -5,6 +5,7 @@ const request = require('request');
 var page = require('./page.js');
 var transget = require('./transget.js');
 var grab = require('./grab.js');
+var log = require('./log.js');
 
 var app = express();
 var port = 3000;
@@ -24,6 +25,18 @@ app.use( (req, res, next) => {
   if (req.headers.referer) {
     // Extract language from referer
     res.locals.referer = req.headers.referer.match( /^https?\:\/\/.+(\/page\/([a-zA-Z]{2,}(?:\-[a-zA-Z]{2,}){0,2}))(?:\/wiki)?(\/.*?)?(?:\/.*)?$/ );
+    //if (!res.locals.referer) {
+    //  console.warn(log.colours.FgYellow + 'REFERER, BUT NOT STORED' + log.colours.Reset);
+    //  console.info(log.colours.FgGreen + '\tREQUESTING:' + log.colours.Reset, req.url);
+    //  console.info(log.colours.FgGreen + '\tREFERER:' + log.colours.Reset, req.headers.referer);
+    //  //console.log('\t' + JSON.stringify(req.headers, null, 2).replace(/\n\r?/g, '\n\t'));
+    //} else {
+    //  console.warn(log.colours.FgYellow + 'REFERER STORED' + log.colours.Reset);
+    //  console.info(log.colours.FgGreen + '\tREQUESTING:' + log.colours.Reset, req.url);
+    //  console.info(log.colours.FgGreen + '\tREFERER:' + log.colours.Reset, req.headers.referer);
+    //  //console.log('\t' + JSON.stringify(req.headers, null, 2).replace(/\n\r?/g, '\n\t'));
+    //  //console.log('\t%O', req.headers);
+    //}
   }
   next();
 })
