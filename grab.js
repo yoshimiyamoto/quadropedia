@@ -2,7 +2,7 @@
 
 var fs = require('fs');
 var request = require('request');
-var log = require('./log.js');
+var log = require('./log-extras.js');
 
 var grab = module.exports = {};
 

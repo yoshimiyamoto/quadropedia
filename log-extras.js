@@ -1,4 +1,5 @@
-// log.js - Colours for use with console.log
+// log-extras.js - Features for use with console.log
+// currently only for colour escape codes
 
 var log = module.exports = {};
 

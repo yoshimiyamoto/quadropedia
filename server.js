@@ -5,7 +5,7 @@ const request = require('request');
 var page = require('./page.js');
 var transget = require('./transget.js');
 var grab = require('./grab.js');
-var log = require('./log.js');
+var log = require('./log-extras.js');
 
 var app = express();
 var port = 3000;
