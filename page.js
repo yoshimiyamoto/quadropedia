@@ -13,7 +13,6 @@ router.get(/^\/([a-zA-Z]{2,}(?:\-[a-zA-Z]{2,}){0,2})(\/wiki\/.*?)(?:\/.*)?$/, fu
   var lang = req.params[0];
   var ref = req.params[1];
   var uri = encodeURI("https://" + lang + ".m.wikipedia.org" + ref);
-
   request({uri: uri}, function(err, response, body){
     res.send(body);
   })

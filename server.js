@@ -25,18 +25,18 @@ app.use( (req, res, next) => {
   if (req.headers.referer) {
     // Extract language from referer
     res.locals.referer = req.headers.referer.match( /^https?\:\/\/.+(\/page\/([a-zA-Z]{2,}(?:\-[a-zA-Z]{2,}){0,2}))(?:\/wiki)?(\/.*?)?(?:\/.*)?$/ );
-    //if (!res.locals.referer) {
-    //  console.warn(log.colours.FgYellow + 'REFERER, BUT NOT STORED' + log.colours.Reset);
-    //  console.info(log.colours.FgGreen + '\tREQUESTING:' + log.colours.Reset, req.url);
-    //  console.info(log.colours.FgGreen + '\tREFERER:' + log.colours.Reset, req.headers.referer);
-    //  //console.log('\t' + JSON.stringify(req.headers, null, 2).replace(/\n\r?/g, '\n\t'));
-    //} else {
-    //  console.warn(log.colours.FgYellow + 'REFERER STORED' + log.colours.Reset);
-    //  console.info(log.colours.FgGreen + '\tREQUESTING:' + log.colours.Reset, req.url);
-    //  console.info(log.colours.FgGreen + '\tREFERER:' + log.colours.Reset, req.headers.referer);
-    //  //console.log('\t' + JSON.stringify(req.headers, null, 2).replace(/\n\r?/g, '\n\t'));
-    //  //console.log('\t%O', req.headers);
-    //}
+//    if (!res.locals.referer) {
+//      console.warn(log.colours.FgYellow + 'REFERER, BUT NOT STORED' + log.colours.Reset);
+//      console.info(log.colours.FgGreen + '\tREQUESTING:' + log.colours.Reset, req.url);
+//      console.info(log.colours.FgGreen + '\tREFERER:' + log.colours.Reset, req.headers.referer);
+//      //console.log('\t' + JSON.stringify(req.headers, null, 2).replace(/\n\r?/g, '\n\t'));
+//    } else {
+//      console.warn(log.colours.FgYellow + 'REFERER STORED' + log.colours.Reset);
+//      console.info(log.colours.FgGreen + '\tREQUESTING:' + log.colours.Reset, req.url);
+//      console.info(log.colours.FgGreen + '\tREFERER:' + log.colours.Reset, req.headers.referer);
+//      //console.log('\t' + JSON.stringify(req.headers, null, 2).replace(/\n\r?/g, '\n\t'));
+//      //console.log('\t%O', req.headers);
+//    }
   }
   next();
 })
@@ -58,7 +58,12 @@ app.get('/wiki/*', function(req, res){
 
 app.get('/languages', grab.allLanguages);
 
-app.get('/w/*', grab.static);
+app.get('/w/index.php*', function(req, res){
+  // Drop requests to plain index page (search page)
+  // Send a 'No content' status
+  res.status(204).end();
+});
+app.get(['/w/load.php*', '/w/api.php*'], grab.static);
 app.get('/static/*', grab.static);
 
 app.use('/page', page);

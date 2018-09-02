@@ -10,7 +10,7 @@ grab.static = function(req, res){
   var referer = res.locals.referer;
   var uri_lang;
 
-  if (!referer) console.log('ERROR - NO LOCAL REFERER FOR STATIC REQ:', req.headers);
+//  if (!referer) console.log('ERROR - NO LOCAL REFERER FOR STATIC REQ:', req.headers);
 
   if (req.query.lang == null) {
     if (referer) {
@@ -43,8 +43,6 @@ grab.static = function(req, res){
       console.log("Error:", err);
     } else {
       res.set(response.headers);
-      //if (response.headers['content-type'].includes('image/png')) {
-      //}
       res.send(body);
     }
   });
