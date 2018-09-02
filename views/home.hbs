@@ -1,11 +1,18 @@
     <script type="text/javascript" src="static/main.js"></script>
     <!--<p id="debug" style="height: 2em;"></p>-->
     <div id="container">
+      <input type="checkbox" id="toggle" />
+      <div id="langSelector">
       {{#iter numFrames}}
-      <div>
-        <select id="langSelect_{{this}}" onchange="changeFrameLang(this)" style="width:100%;">
+        <select id="langSelect_{{this}}" onchange="changeFrameLang(this)">
           <option value="" disabled selected>Select language</option>
         </select>
+      {{/iter}}
+      </div>
+      <div id="langSelectorToggle"><label for="toggle"><span>...</span></label>
+    </div>
+      {{#iter numFrames}}
+      <div class="frameholder">
         <div class="frameURL"></div>
         <iframe id="" src="" frameborder="0"></iframe>
       </div>

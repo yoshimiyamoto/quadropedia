@@ -129,7 +129,8 @@ function changeFrameLang(obj){
   var sectionId = obj.id.split('_')[1];
   var newLang = obj.value;
   // Alter relevant frame and select object id's
-  obj.parentNode.getElementsByTagName("iframe")[0].id = newLang;
+//  obj.parentNode.parentNode.getElementsByTagName("iframe")[sectionId].id = newLang;
+  document.getElementsByTagName("iframe")[sectionId].id = newLang;
   // Update frame reference
   frameLangs[sectionId] = newLang;
   // Prep new frame src
