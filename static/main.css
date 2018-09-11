@@ -1,0 +1,68 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body > div {
+  height: 100%;
+  width: 100%;
+}
+
+#langSelector select {
+  float: left;
+  width: 25%;
+}
+
+#langSelectorToggle {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  float:left;
+}
+#langSelectorToggle label {
+  display: block;
+  width 100%;
+  background-color: #f6f7f9;
+  border:1px solid #c2c9d5;
+  border-top: 0px;
+  border-radius: 0px 0px 5px 5px;
+  height:0.5em;
+}
+#langSelectorToggle label:hover {
+  background-color: #e0e4eb;
+}
+#langSelectorToggle span {
+  display: inline-block;
+  margin-top: -0.3em;
+  line-height: 0.5em;
+  vertical-align: top;
+  color: #a3adc2
+}
+input[type=checkbox] {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+}
+input[type=checkbox]:checked ~ #langSelector {
+  display:none;
+}
+
+.frameholder {
+  float: left;
+  height: 100%;
+  width: 25%;
+}
+
+iframe {
+  height: 99%;
+  width: 100%;
+}
+
+@media print {
+  #langSelectorToggle { display: none; }
+}
