@@ -18,6 +18,12 @@ document.addEventListener("DOMContentLoaded", function(){
     if (this.readyState == 4 && this.status == 200) {
       populateLanguageSelects(JSON.parse(this.responseText));
       initStorage();
+    } else {
+      if (DEBUG) {
+        console.log("ERROR: Failed to load language options.");
+        console.log("readyState: " + this.readyState + " - status: " + this.status);
+        //console.log(this.responseText);
+      }
     }
   }
   xhr.open("GET", "languages", true);
