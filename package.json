@@ -9,9 +9,9 @@
   "author": "Yoshi Miyamoto",
   "license": "UNLICENSED",
   "dependencies": {
-    "express": "^4.16.3",
-    "express-handlebars": "^3.0.0",
-    "htmlparser2": "^3.9.2",
-    "request": "^2.87.0"
+    "express": "^4.16.4",
+    "express-handlebars": "^3.0.2",
+    "htmlparser2": "^3.10.1",
+    "request": "^2.88.0"
   }
 }
