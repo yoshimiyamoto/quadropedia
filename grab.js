@@ -51,10 +51,16 @@ grab.static = function(req, res){
 grab.allLanguages = function(req, res){
   var UPDATE = false;
   var curr_date = new Date();
-
   var dir = "./data/";
   var file;
-  var files = fs.readdirSync(dir);
+  var files;
+
+  if (!fs.existsSync(dir)){
+    fs.mkdirSync(dir);
+  }
+
+  files = fs.readdirSync(dir);
+
   for (var i = 0; i < files.length; i++){
     // Warning: Grabs only the first match if any
     file = files[i].match(/^languages\_([0-9]{4})\-([0-9]{2})\-([0-9]{2})\.json$/);
