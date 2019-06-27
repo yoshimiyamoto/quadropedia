@@ -16,7 +16,8 @@ grab.static = function(req, res){
     if (referer) {
       uri_lang = referer[2];
     } else {
-      console.log("Error - Language Missing:", referer);
+      console.log("Error - Language Missing:", referer, "(Setting to default EN)");
+      uri_lang = "en";
     }
   } else {
     uri_lang = req.query.lang;
@@ -89,12 +90,13 @@ grab.allLanguages = function(req, res){
       }
       else {
         cells = htmlparser.DomUtils.findAll(function (elem){
-          if (elem.name == "td" && elem.children.length > 1 && elem.children[0].attribs && elem.children[0].attribs.id) {
+          if (elem.name == "td" && elem.attribs && elem.attribs.id) {
+            //console.log(elem);
             return true;
           }
         }, dom);
         for (cell of cells) {
-          available[cell.children[0].attribs.id] = { 'original' : cell.children[1].children[0].children[0].data, 'romanized' : cell.children[1].attribs.title };
+          available[cell.attribs.id] = { 'original' : cell.children[0].children[0].children[0].data, 'romanized' : cell.children[0].attribs.title };
         }
       }
     }, {normalizeWhitespace: true})
